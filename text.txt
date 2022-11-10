@@ -1,0 +1,8 @@
+1. A bill number x
+    - Check with bank that x hasn't been used before
+    - One bill is made up of multiple chunks
+    - Each bill is 20 chunks
+    - Each bill will be 10 digits
+2. Send the buyer a string of 0's and 1's to show what we want from the buyer
+    - chooses 0, buyer gives merchant I ⊕ ai, di, and xi
+    - chooses 1, buyer gives merchant ai, ci, and y
