@@ -78,4 +78,8 @@ public class Merchant {
         decrypting_temp1 = to_checkHash;
         return to_checkHash;
     }
+
+    public static void main(String args[]) {
+        
+    }
 }
