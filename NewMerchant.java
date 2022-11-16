@@ -21,8 +21,26 @@ public class NewMerchant {
      * 0 --> I ⊕ ai, di, and xi, OR
      * 1 --> ai, ci, and yi
      */
-    public static void f(x, y) {
-        
+    // Hashfunction for x and y
+    public static String f(BigInteger x, BigInteger y) throws NoSuchAlgorithmException {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        } catch (Exception e) {
+            throw new NoSuchAlgorithmException();
+        }
+        String result = x.toString() + y.toString();
+        return result;
+    }
+
+    // Hashfunction for g
+    public static String g(BigInteger x, BigInteger y) throws NoSuchAlgorithmException {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        } catch (Exception e) {
+            throw new NoSuchAlgorithmException();
+        }
+        String result = x.toString() + y.toString();
+        return result;
     }
 
     public static void main(String args[]) throws NoSuchAlgorithmException {
