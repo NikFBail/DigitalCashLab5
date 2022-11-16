@@ -6,3 +6,10 @@
 2. Send the buyer a string of 0's and 1's to show what we want from the buyer
     - chooses 0, buyer gives merchant I ⊕ ai, di, and xi
     - chooses 1, buyer gives merchant ai, ci, and y
+
+
+Get multiple chunks, compare to banks signature(take to power e)
+Verify banks signature on product, they should match
+Generate 0s and 1s for each chunk, customer gives info depending on 0 and 1
+Reject if something doesn't match, complain to bank
+Otherwise send to bank
