@@ -25,10 +25,11 @@ public class NewMerchant {
     public static String f(BigInteger x, BigInteger y) throws NoSuchAlgorithmException {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        } catch (Exception e) {
+        } catch (NoSuchAlgorithmException e) {
             throw new NoSuchAlgorithmException();
         }
         String result = x.toString() + y.toString();
+        byte[] encodeHash = digest.digest(originalString.getBytes(StandardCharsets.UTF_8));
         return result;
     }
 
@@ -47,7 +48,6 @@ public class NewMerchant {
         BigInteger bank1 = new BigInteger("45102246070852877005834805071565697303530753565236670573550117115010865770545266090895421231898028549377566326963374616157756280120181748932018677751293313293523827859377666639166849915682609959979131340115018334098535898721356842525455183760413239157639236971732220612271453478131788159610221783610160493541");
         BigInteger bank1Account = new BigInteger("3553584");
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        // final byte[] encodeHash = digest.digest(originalString.getBytes(StandardCharsets.UTF_8));
         System.out.println(stringGen());
     }
 }
