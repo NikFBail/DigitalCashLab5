@@ -10,70 +10,124 @@ import java.security.MessageDigest;
 
 public class Merchant {
 
+    public enum Bank{
+        OLLIE, CONOR
+    }
+
+    static public Bank selected = Bank.CONOR;
+
     // todo: change this to the public key later
 
     public static final Scanner scanner = new Scanner(System.in);
-    public static final BigInteger e = BigInteger.ZERO;
-    public static final BigInteger n = BigInteger.ONE; // These two things are the Bank's public
+
+    // Bank 1's public key pair
+    public static final BigInteger CONOR_EXPONENT = BigInteger.ZERO;
+    public static final BigInteger CONOR_N = BigInteger.ONE; // These two things are the Bank's public
+
+    // Bank 2's public key pair
+    public static final BigInteger OLLIE_EXPONENT = BigInteger.ZERO;
+    public static final BigInteger OLLIE_N = BigInteger.ONE;
 
     public static void main(String[] args) {
         System.out.println("---------- Wish.com ----------");
-        System.out.println(convertStringToArray("[[22,33,12],[214,52,12]]"));
-        System.out.println(g(BigInteger.valueOf(310830192), BigInteger.valueOf(48927492)));
         prompt();
     }
 
     /*
     1. Generate a string of zeros and ones, give it to the customer.
-    2. The customer either gives back :
-        I ⊕ ai, di, and xi for a 0    OR
-        ai, ci, and yi for a 1.
-    3. Use those inputs to validate f(xi, yi) and make sure its not double spent.
+    2. The customer either gives back I ⊕ ai, di, and xi for a 0 OR a
+    ai, ci, and yi for a 1.
+    3. Use those inputs to validate f(xi,yi) and make sure its not double spent.
     4. If it is valid and has not been double spent, deposit in the merchant bank account.
-
-
-    - ai is a binary number the same length as I, which is the customer account number concatenated with the bill number, so 18 digits.
+     */
+    /*
+    - ai is a binary number the same length as I, which is the customer account number concatenated with the bill number,
+     so 18 digits.
 
     - ci and di are both random numbers for each chunk
+     */
 
-    Tasks:
-        implement SHA
-        use BigInteger
-        method getBytes of string class for SHA
+    /*  Tasks:
+    implement SHA
+    use BigInteger
+    method getBytes of string class for SHA
 
-    Details:
-        key ~ 1000 bit modulus, generate 500-bit or so primes
-        account number is 8 digits, bill number will be 10 digits
-        a,c,d are between 0 and 2^(128)-1
-        Use SHA-256 on concatenation of inputs for the XOR with a and padded with zeros on the left to 128 bits
-        Has functions f,g use result of SHA-256 on the concatenation of the two inputs in the order given in the description
-        k = k' = 10 for testing
+        Details:
+    key ~ 1000 bit modulus, generate 500-bit or so primes
+    account number is 8 digits, bill number will be 10 digits
+    a,c,d are between 0 and 2^(128)-1
+    Use SHA-256 on concatenation of inputs for the XOR with a and padded with zeros on the left to 128 bits
+    Has functions f,g use result of SHA-256 on the concatenation of the two inputs in the order given in the description
+    k = k' = 10 for testing
+     */
 
+    /*
     As merchants, we only verify cash is valid and deposit the cash in the bank.
     We also check with the bank to make sure the bill number, x, hasn't been used before.
-    */
-
-    /* Customers send merchants (x, f(x)^d).  We verify by calculating f(x) = f(x)^d^e using the bank's public exponent e.
      */
-    public static boolean verifyBill(BigInteger fx) {
-        boolean equals = fx.equals(fx.modPow(e, n));
-        return equals; // check that integer is not cut off
-    }
 
-    /* We verify by calculating f(xi, yi), because we get ample information from either choice
-     * We feel like we're missing one important piece of information that we need to verify.
+    /*
+    Customers send merchants (x, f(x)^d).  We verify by calculating f(x) = f(x)^d^e using the bank's public exponent e.
+     */
+
+    /*
+    We verify by calculating f(xi, yi) for each chunk, finding the product, and then checking if the
+    product is equal to f(xi, yi)^d^e, because we get ample information from either choice
      */
     public static void verifyBillPrompt() {
         System.out.println("Enter choice string:");
         String choices = scanner.nextLine();
         System.out.println("Enter inputs:");
         String inputs = scanner.nextLine();
+        // todo: double check with customer to see what format they will give us these numbers in
+        System.out.println("Enter the signed bill(?):");
+        BigInteger signed = new BigInteger(scanner.nextLine());
+
         List<List<BigInteger>> converted = convertStringToArray(inputs);
 
-        for (char choice : choices.toCharArray()) {
+        boolean billValid = billChunksAreValid(choices, converted, signed);
 
-        }
+        System.out.println(billValid ? "Bill is valid!": "Bill is invalid!");
     }
+
+    private static boolean billChunksAreValid(String choices, List<List<BigInteger>> converted, BigInteger signed) {
+        List<BigInteger> result = new ArrayList<>();
+        for (int i = 0; i < choices.length(); i++)  {
+            List<BigInteger> cur = converted.get(i);
+
+            switch (choices.charAt(i)){
+                case '1' -> {
+                    BigInteger ai = cur.get(0);
+                    BigInteger ci = cur.get(1);
+                    BigInteger yi = cur.get(2);
+
+                    BigInteger resG = new BigInteger(g(ai,ci), 2);
+                    String fxiyi = f(resG, yi);
+
+                    result.add(new BigInteger(fxiyi, 2));
+                }
+                case '0' -> {
+                    BigInteger aiXORi = cur.get(0);
+                    BigInteger di = cur.get(1);
+                    BigInteger xi = cur.get(2);
+
+                    BigInteger resG = new BigInteger(g(aiXORi,di), 2);
+                    String fxiyi = f(xi, resG);
+
+                    result.add(new BigInteger(fxiyi, 2));
+                }
+            }
+        }
+
+        // multiply all elements in the list together to get the product.
+        BigInteger product = result.stream().reduce(BigInteger.ONE, BigInteger::multiply);
+
+        BigInteger raised = signed.modPow(getE(), getN());
+
+        return raised.equals(product);
+    }
+
+
 
     public static List<List<BigInteger>> convertStringToArray(String inputs){
         inputs = inputs.replace("[", "");
@@ -98,7 +152,6 @@ public class Merchant {
         prompt();
     }
 
-    // Generating a String of 1s and 0s
     public static String calculateOptionString() {
         StringBuilder result = new StringBuilder();
         for (int i = 0; i < 10; i++) {
@@ -107,24 +160,35 @@ public class Merchant {
         return result.toString();
     }
 
-    // Prompting to either verify the bill or generate chunk choices
+
     public static void prompt() {
-        System.out.println("Enter an option:\n1. Verify bill\n2. Generate chunk choices");
+        System.out.println("Currently partnered with the bank of " + selected);
+        System.out.println("Enter an option: \n1. Verify bill\n2. Generate chunk choices\n3. Switch banks");
         switch (new Scanner(System.in).nextInt()) {
-            case 1:
+            case 1 ->
                 verifyBillPrompt();
-                break;
-            case 2:
+            case 2 ->
                 generateChunkChoicesPrompt();
-                break;
-            default:
+            case 3 ->
+                changeBanksPrompt();
+            default ->
                 System.exit(0);
         }
         prompt();
     }
 
-    // todo: convert BigIntegers into binary representation so SHA can hash. Padding needs to be done for the XOR with ai.
-    // Method to perform the hashfunction f
+    private static void changeBanksPrompt() {
+        System.out.println("Select a bank:\n1. The Bank of Conor\n2. The Bank of Ollie");
+        selected = switch (new Scanner(System.in).nextInt()){
+            case 1 -> Bank.CONOR;
+            case 2 -> Bank.OLLIE;
+            default -> Bank.CONOR;
+        };
+        System.out.println("Selected " + selected + "!");
+        prompt();
+    }
+
+    // todo: convert BigIntegers into binary representation so SHA can hash.  Padding needs to be done for the XOR with ai.
     public static String f(BigInteger x, BigInteger y) {
         MessageDigest digest = null;
         try {
@@ -137,7 +201,6 @@ public class Merchant {
                 originalString.getBytes(StandardCharsets.UTF_8)));
     }
 
-    // Method to perform the hashfunction g
     public static String g(BigInteger x, BigInteger y) {
         MessageDigest digest = null;
         try {
@@ -150,13 +213,20 @@ public class Merchant {
                 originalString.getBytes(StandardCharsets.UTF_8)));
     }
 
-    // Converting a byte array to binary
     public static String byteArrayToBinary(byte[] input) {
         StringBuilder result = new StringBuilder();
         for (int i = 0; i < input.length; i++) {
             result.append(Integer.toBinaryString(input[i]));
         }
         return result.toString();
+    }
+
+    public static BigInteger getE(){
+        return selected == Bank.CONOR ? CONOR_EXPONENT: OLLIE_EXPONENT;
+    }
+
+    public static BigInteger getN(){
+        return selected == Bank.OLLIE ? OLLIE_N : CONOR_N;
     }
 
 }
