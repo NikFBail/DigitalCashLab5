@@ -62,7 +62,9 @@ public class Merchant {
     We also check with the bank to make sure the bill number, x, hasn't been used before.
 
     Customers send merchants (x, f(x)^d).  We verify by calculating f(x) = f(x)^d^e using the bank's public exponent e.
+    */
 
+    /*
     We verify by calculating f(xi, yi) for each chunk, finding the product, and then checking if the
     product is equal to f(xi, yi)^d^e, because we get ample information from either choice
      */
@@ -77,12 +79,12 @@ public class Merchant {
 
         List<List<BigInteger>> converted = convertStringToArray(inputs);
 
-        boolean billValid = billChunksAreValid(choices, converted, signed);
+        boolean billValid = validBillChunks(choices, converted, signed);
 
         System.out.println(billValid ? "Bill is valid!": "Bill is invalid!");
     }
 
-    private static boolean billChunksAreValid(String choices, List<List<BigInteger>> converted, BigInteger signed) {
+    private static boolean validBillChunks(String choices, List<List<BigInteger>> converted, BigInteger signed) {
         List<BigInteger> result = new ArrayList<>();
         for (int i = 0; i < choices.length(); i++)  {
             List<BigInteger> cur = converted.get(i);
@@ -119,8 +121,6 @@ public class Merchant {
         return raised.equals(product);
     }
 
-
-
     public static List<List<BigInteger>> convertStringToArray(String inputs){
         inputs = inputs.replace("[", "");
         inputs = inputs.replace("]", "");
@@ -152,7 +152,6 @@ public class Merchant {
         return result.toString();
     }
 
-
     public static void prompt() {
         System.out.println("Currently partnered with the bank of " + selected);
         System.out.println("Enter an option: \n1. Verify bill\n2. Generate chunk choices\n3. Switch banks");
@@ -181,6 +180,7 @@ public class Merchant {
     }
 
     // todo: convert BigIntegers into binary representation so SHA can hash.  Padding needs to be done for the XOR with ai.
+    // Performs hash function f
     public static String f(BigInteger x, BigInteger y) {
         MessageDigest digest = null;
         try {
@@ -193,6 +193,7 @@ public class Merchant {
                 originalString.getBytes(StandardCharsets.UTF_8)));
     }
 
+    // Performs hash function g
     public static String g(BigInteger x, BigInteger y) {
         MessageDigest digest = null;
         try {
@@ -213,10 +214,12 @@ public class Merchant {
         return result.toString();
     }
 
+    // Gets the banks e from their public key (e, n)
     public static BigInteger getE(){
         return selected == Bank.CONOR ? CONOR_EXPONENT: OLLIE_EXPONENT;
     }
 
+    // Gets the banks n from their public key (e, n)
     public static BigInteger getN(){
         return selected == Bank.OLLIE ? OLLIE_N : CONOR_N;
     }
