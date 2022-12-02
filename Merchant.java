@@ -94,9 +94,9 @@ public class Merchant {
                     BigInteger yi = cur.get(2);
 
                     BigInteger resG = new BigInteger(g(ai,ci), 2);
-                    String fxiyi = f(resG, yi);
+                    BigInteger resF = new BigInteger(f(resG, yi), 2);
 
-                    result.add(new BigInteger(fxiyi, 2));
+                    result.add(resF);
                 }
                 case '0': {
                     BigInteger aiXORi = cur.get(0);
@@ -104,9 +104,9 @@ public class Merchant {
                     BigInteger xi = cur.get(2);
 
                     BigInteger resG = new BigInteger(g(aiXORi,di), 2);
-                    String fxiyi = f(xi, resG);
+                    BigInteger resF = new BigInteger(f(xi, resG), 2);
 
-                    result.add(new BigInteger(fxiyi, 2));
+                    result.add(resF);
                 }
             }
         }
@@ -152,7 +152,7 @@ public class Merchant {
 
     public static void prompt() {
         System.out.println("Currently partnered with the bank of " + selected);
-        System.out.println("Enter an option: \n1. Verify bill\n2. Generate chunk choices\n3. Switch banks");
+        System.out.println("Enter an option:\n1. Verify bill\n2. Generate chunk choices\n3. Switch banks");
         switch (new Scanner(System.in).nextInt()) {
             case 1:
                 verifyBillPrompt();
@@ -177,7 +177,7 @@ public class Merchant {
         prompt();
     }
 
-    // todo: convert BigIntegers into binary representation so SHA can hash.  Padding needs to be done for the XOR with ai.
+    // todo: convert BigIntegers into binary representation so SHA can hash.
     // Performs hash function f
     public static String f(BigInteger x, BigInteger y) {
         MessageDigest digest = null;
@@ -214,7 +214,7 @@ public class Merchant {
 
     // Gets the banks e from their public key (e, n)
     public static BigInteger getE(){
-        return selected == Bank.CONNER ? CONNER_EXPONENT: OLLIE_EXPONENT;
+        return selected == Bank.OLLIE ? OLLIE_EXPONENT: CONNER_EXPONENT;
     }
 
     // Gets the banks n from their public key (e, n)
