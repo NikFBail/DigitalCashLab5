@@ -114,7 +114,7 @@ public class Merchant {
         }
 
         // multiply all elements in the list together to get the product.
-        BigInteger product = result.stream().reduce(BigInteger.ONE, BigInteger::multiply);
+        BigInteger product = result.stream().reduce(BigInteger.ONE, BigInteger::multiply).mod(getN());
 
         BigInteger raised = signed.modPow(getE(), getN());
 
