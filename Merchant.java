@@ -97,6 +97,7 @@ public class Merchant {
                     BigInteger resF = new BigInteger(f(resG, yi), 2);
 
                     result.add(resF);
+                    break;
                 }
                 case '0': {
                     BigInteger aiXORi = cur.get(0);
@@ -107,6 +108,7 @@ public class Merchant {
                     BigInteger resF = new BigInteger(f(xi, resG), 2);
 
                     result.add(resF);
+                    break;
                 }
             }
         }
@@ -156,10 +158,13 @@ public class Merchant {
         switch (new Scanner(System.in).nextInt()) {
             case 1:
                 verifyBillPrompt();
+                break;
             case 2:
                 generateChunkChoicesPrompt();
+                break;
             case 3:
                 changeBanksPrompt();
+                break;
             default:
                 System.exit(0);
         }
@@ -169,8 +174,12 @@ public class Merchant {
     private static void changeBanksPrompt() {
         System.out.println("Select a bank:\n1. The Bank of Conner\n2. The Bank of Ollie");
         switch (new Scanner(System.in).nextInt()) {
-            case 1: selected = Bank.CONNER;
-            case 2: selected = Bank.OLLIE;
+            case 1: 
+                selected = Bank.CONNER;
+                break;
+            case 2:
+                selected = Bank.OLLIE;
+                break;
             default: selected = Bank.CONNER;
         };
         System.out.println("Selected " + selected + "!");
