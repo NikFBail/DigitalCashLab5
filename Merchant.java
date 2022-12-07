@@ -11,7 +11,7 @@ import java.security.MessageDigest;
 public class Merchant {
 
     public enum Bank{
-        OLLIE, CONNER
+        OLLIE, CONNER, LLOYD
     }
 
     static public Bank selected = Bank.OLLIE;
@@ -19,12 +19,16 @@ public class Merchant {
     public static final Scanner scanner = new Scanner(System.in);
 
     // Bank 1's public key pair
-    public static final BigInteger CONNER_EXPONENT = BigInteger.ZERO;
-    public static final BigInteger CONNER_N = BigInteger.ONE; // These two things are the Bank's public
+    public static final BigInteger CONNER_EXPONENT = new BigInteger("819864850245673");
+    public static final BigInteger CONNER_N = new BigInteger("4544651104410199"); // These two things are the Bank's public
 
     // Bank 2's public key pair
-    public static final BigInteger OLLIE_EXPONENT = new BigInteger("45102246070852877005834805071565697303530753565236670573550117115010865770545266090895421231898028549377566326963374616157756280120181748932018677751293313293523827859377666639166849915682609959979131340115018334098535898721356842525455183760413239157639236971732220612271453478131788159610221783610160493541");
-    public static final BigInteger OLLIE_N = new BigInteger("7");
+    public static final BigInteger OLLIE_N = new BigInteger("45102246070852877005834805071565697303530753565236670573550117115010865770545266090895421231898028549377566326963374616157756280120181748932018677751293313293523827859377666639166849915682609959979131340115018334098535898721356842525455183760413239157639236971732220612271453478131788159610221783610160493541");
+    public static final BigInteger OLLIE_EXPONENT = new BigInteger("7");
+
+    // Lloyd's bank is better than Conner's
+    public static final BigInteger LLOYD_EXPONENT = new BigInteger("819864850245673");
+    public static final BigInteger LLOYD_N = new BigInteger("4544651104410199"); // These two things are the Bank's public
 
     public static void main(String[] args) {
         System.out.println("---------- Monsters Inc. ----------");
@@ -125,7 +129,7 @@ public class Merchant {
         inputs = inputs.replace("[", "");
         inputs = inputs.replace("]", "");
 
-        String[] vals = inputs.split(", ");
+        String[] vals = inputs.split(",");
 
         List<List<BigInteger>> result = new ArrayList<>();
         List<BigInteger> temp = new ArrayList<>();
@@ -175,12 +179,12 @@ public class Merchant {
         System.out.println("Select a bank:\n1. The Bank of Conner\n2. The Bank of Ollie");
         switch (new Scanner(System.in).nextInt()) {
             case 1: 
-                selected = Bank.CONNER;
+                selected = Bank.LLOYD;
                 break;
             case 2:
                 selected = Bank.OLLIE;
                 break;
-            default: selected = Bank.CONNER;
+            default: selected = Bank.LLOYD;
         };
         System.out.println("Selected " + selected + "!");
         prompt();
@@ -223,12 +227,12 @@ public class Merchant {
 
     // Gets the banks e from their public key (e, n)
     public static BigInteger getE(){
-        return selected == Bank.OLLIE ? OLLIE_EXPONENT: CONNER_EXPONENT;
+        return selected == Bank.OLLIE ? OLLIE_EXPONENT: LLOYD_EXPONENT;
     }
 
     // Gets the banks n from their public key (e, n)
     public static BigInteger getN(){
-        return selected == Bank.OLLIE ? OLLIE_N : CONNER_N;
+        return selected == Bank.OLLIE ? OLLIE_N : LLOYD_N;
     }
 
 }
